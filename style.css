@@ -1,0 +1,41 @@
+#container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto;
+    gap: 10px;
+}
+
+#formContainer {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: repeat(5, 1fr);
+    gap: 5px;
+}
+
+#btnListBooks {
+    align-self: center;
+    justify-self: center;
+    grid-column: 1;
+    grid-row: 2;
+}
+
+#library {
+    width: 80%;
+    grid-column: 1 / 4;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 10px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+
+
+
+
