@@ -24,15 +24,42 @@ const addBookToLibrary = () => {
         let textValue = document.createTextNode(value);
         newCell.appendChild(textValue);
     }
-    clearInputFlds();
+
+    (function addDeleteButton(book, row) {
+        let btnDelete = document.createElement('button');
+        btnDelete.textContent = 'X';
+        btnDelete.classList.add('btn-delete');
+        btnDelete.value = newBook.index;
+        console.log(myLibrary.length);
+        btnDelete.addEventListener('click', deleteBook);
+        let deleteCell = newTableRow.insertCell();
+        deleteCell.appendChild(btnDelete);
+    }());
+
+    (function clearInputFlds() {
+        inpBookTitle.value = '';
+        inpBookAuthor.value = '';
+        inpBookPages.value = '';
+        deactivateAddBtn();
+    }());
+
+    //addDeleteButton(newBook, newTableRow);
+    //clearInputFlds();
 };
 
-const clearInputFlds = () => {
-    inpBookTitle.value = '';
-    inpBookAuthor.value = '';
-    inpBookPages.value = '';
-    deactivateAddBtn();
-};
+const deleteBook = (e) => {
+    let row = e.target.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+    myLibrary.splice(e.target.value, 1);
+    console.log(myLibrary.length);
+}
+
+// const clearInputFlds = () => {
+//     inpBookTitle.value = '';
+//     inpBookAuthor.value = '';
+//     inpBookPages.value = '';
+//     deactivateAddBtn();
+// };
 
 const deactivateAddBtn = () => {
     let title = inpBookTitle.value;
@@ -121,11 +148,13 @@ const thPages = document.createElement('th');
 thPages.textContent = 'Pages';
 const thIsRead = document.createElement('th');
 thIsRead.textContent = 'Read';
+const thDelete = document.createElement('th');
 
 trHead.appendChild(thTitle);
 trHead.appendChild(thAuthor);
 trHead.appendChild(thPages);
 trHead.appendChild(thIsRead);
+trHead.appendChild(thDelete);
 tableHead.appendChild(trHead);
 libTable.appendChild(tableHead);
 libTable.appendChild(tableBody);
