@@ -6,6 +6,12 @@ function Book(title, author, pages, isRead) {
     this.isRead = (isRead === true) ? 'Read' : 'Not read';
 }
 
+Book.prototype.changeReadStatus = function(e) {
+    this.isRead = (this.isRead === 'Read') ? 'Not read' : 'Read';
+    e.target.classList.toggle('active');
+    e.target.textContent = this.isRead;
+}
+
 const addBookToLibrary = () => {
     let title = inpBookTitle.value;
     let author = inpBookAuthor.value;
@@ -13,19 +19,32 @@ const addBookToLibrary = () => {
     let isRead = inpBookIsRead.checked;
     
     let newBook = new Book(title, author, pages, isRead);
-    myLibrary.push(newBook);
     newBook.index = myLibrary.indexOf(newBook);
 
-    let newTableRow = libTable.insertRow();
+    myLibrary.push(newBook);
+
+    let newTableRow = tableBody.insertRow();
     
     for (const [key, value] of Object.entries(newBook)) {
         if (key === 'index') continue;
+
         let newCell = newTableRow.insertCell();
+
+        if (key === 'isRead') {
+            let btnIsRead = document.createElement('button');
+            btnIsRead.classList.add('btn-is-read');
+            btnIsRead.addEventListener('click', newBook.changeReadStatus.bind(newBook));
+            if (value === 'Read') { btnIsRead.classList.toggle('active'); }
+            btnIsRead.textContent = value;
+            newCell.appendChild(btnIsRead);
+            continue;
+        }
+        
         let textValue = document.createTextNode(value);
         newCell.appendChild(textValue);
     }
 
-    (function addDeleteButton(book, row) {
+    (function addDeleteButton() {
         let btnDelete = document.createElement('button');
         btnDelete.textContent = 'X';
         btnDelete.classList.add('btn-delete');
@@ -33,7 +52,9 @@ const addBookToLibrary = () => {
         console.log(myLibrary.length);
         btnDelete.addEventListener('click', deleteBook);
         let deleteCell = newTableRow.insertCell();
+        deleteCell.classList.add('delete-cell');
         deleteCell.appendChild(btnDelete);
+        
     }());
 
     (function clearInputFlds() {
@@ -42,9 +63,6 @@ const addBookToLibrary = () => {
         inpBookPages.value = '';
         deactivateAddBtn();
     }());
-
-    //addDeleteButton(newBook, newTableRow);
-    //clearInputFlds();
 };
 
 const deleteBook = (e) => {
@@ -54,21 +72,13 @@ const deleteBook = (e) => {
     console.log(myLibrary.length);
 }
 
-// const clearInputFlds = () => {
-//     inpBookTitle.value = '';
-//     inpBookAuthor.value = '';
-//     inpBookPages.value = '';
-//     deactivateAddBtn();
-// };
-
-const deactivateAddBtn = () => {
+function deactivateAddBtn() {
     let title = inpBookTitle.value;
     let author = inpBookAuthor.value;
     let pages = inpBookPages.value;
 
     (title === '' || author === '' || pages === '') ? 
         btnAddBook.disabled = true : btnAddBook.disabled = false;
-
 };
 
 let myLibrary = [];

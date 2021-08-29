@@ -26,13 +26,35 @@
 }
 
 th, td {
-    border: 1px solid #dddddd;
+    border-bottom: 1px solid #bbbbbb;
     text-align: left;
-    padding: 10px;
+    padding: 5px;
 }
 
-tr:nth-child(even) {
+tbody > tr:nth-child(odd) {
     background-color: #dddddd;
+}
+
+td:last-child {
+    width: 0;
+}
+
+.btn-is-read {
+    width: 100px;
+    height: 30px;
+    border-radius: 20px;
+    font-style: italic;
+    font-weight: bolder;
+    background-color: #cc1818;
+}
+
+.btn-is-read:hover {
+    cursor: pointer;
+    filter: brightness(0.90);
+}
+
+.active {
+    background-color: rgb(25, 201, 84);
 }
 
 
