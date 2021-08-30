@@ -19,9 +19,8 @@ const addBookToLibrary = () => {
     let isRead = inpBookIsRead.checked;
     
     let newBook = new Book(title, author, pages, isRead);
-    newBook.index = myLibrary.indexOf(newBook);
-
     myLibrary.push(newBook);
+    newBook.index = myLibrary.indexOf(newBook);
 
     let newTableRow = tableBody.insertRow();
     
@@ -49,7 +48,6 @@ const addBookToLibrary = () => {
         btnDelete.textContent = 'X';
         btnDelete.classList.add('btn-delete');
         btnDelete.value = newBook.index;
-        console.log(myLibrary.length);
         btnDelete.addEventListener('click', deleteBook);
         let deleteCell = newTableRow.insertCell();
         deleteCell.classList.add('delete-cell');
@@ -68,8 +66,10 @@ const addBookToLibrary = () => {
 const deleteBook = (e) => {
     let row = e.target.parentNode.parentNode;
     row.parentNode.removeChild(row);
-    myLibrary.splice(e.target.value, 1);
-    console.log(myLibrary.length);
+    let bookToBeDeleted = myLibrary.find(book => book.index == e.target.value);
+    myLibrary.splice(myLibrary.indexOf(bookToBeDeleted), 1);
+    let altLib = myLibrary.map(book => book.title);
+    console.log(altLib);
 }
 
 function deactivateAddBtn() {
