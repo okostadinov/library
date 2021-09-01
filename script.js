@@ -8,8 +8,45 @@ function Book(title, author, pages, isRead) {
 
 Book.prototype.changeReadStatus = function(e) {
     this.isRead = (this.isRead === 'Read') ? 'Not read' : 'Read';
+
     e.target.classList.toggle('active');
     e.target.textContent = this.isRead;
+}
+
+const addBookToTable = (book) => {
+    let newTableRow = tableBody.insertRow();
+        
+        for (const [key, value] of Object.entries(book)) {
+            if (key === 'index') continue;
+
+            let newCell = newTableRow.insertCell();
+
+            if (key === 'isRead') {
+                let btnIsRead = document.createElement('button');
+                btnIsRead.classList.add('btn-is-read');
+                var self = book;
+                btnIsRead.addEventListener('click', book.changeReadStatus);
+                if (value === 'Read') { btnIsRead.classList.toggle('active'); }
+                btnIsRead.textContent = value;
+                newCell.appendChild(btnIsRead);
+                continue;
+            }
+            
+            let textValue = document.createTextNode(value);
+            newCell.appendChild(textValue);
+        }
+
+    (function addDeleteButton() {
+        let btnDelete = document.createElement('button');
+        btnDelete.textContent = 'X';
+        btnDelete.classList.add('btn-delete');
+        btnDelete.value = book.index;
+        btnDelete.addEventListener('click', deleteBook);
+        let deleteCell = newTableRow.insertCell();
+        deleteCell.classList.add('delete-cell');
+        deleteCell.appendChild(btnDelete);
+        
+    }());
 }
 
 const addBookToLibrary = () => {
@@ -22,38 +59,8 @@ const addBookToLibrary = () => {
     myLibrary.push(newBook);
     newBook.index = myLibrary.indexOf(newBook);
 
-    let newTableRow = tableBody.insertRow();
-    
-    for (const [key, value] of Object.entries(newBook)) {
-        if (key === 'index') continue;
-
-        let newCell = newTableRow.insertCell();
-
-        if (key === 'isRead') {
-            let btnIsRead = document.createElement('button');
-            btnIsRead.classList.add('btn-is-read');
-            btnIsRead.addEventListener('click', newBook.changeReadStatus.bind(newBook));
-            if (value === 'Read') { btnIsRead.classList.toggle('active'); }
-            btnIsRead.textContent = value;
-            newCell.appendChild(btnIsRead);
-            continue;
-        }
-        
-        let textValue = document.createTextNode(value);
-        newCell.appendChild(textValue);
-    }
-
-    (function addDeleteButton() {
-        let btnDelete = document.createElement('button');
-        btnDelete.textContent = 'X';
-        btnDelete.classList.add('btn-delete');
-        btnDelete.value = newBook.index;
-        btnDelete.addEventListener('click', deleteBook);
-        let deleteCell = newTableRow.insertCell();
-        deleteCell.classList.add('delete-cell');
-        deleteCell.appendChild(btnDelete);
-        
-    }());
+    addBookToStorage(newBook);
+    addBookToTable(newBook);
 
     (function clearInputFlds() {
         inpBookTitle.value = '';
@@ -66,10 +73,22 @@ const addBookToLibrary = () => {
 const deleteBook = (e) => {
     let row = e.target.parentNode.parentNode;
     row.parentNode.removeChild(row);
-    let bookToBeDeleted = myLibrary.find(book => book.index == e.target.value);
-    myLibrary.splice(myLibrary.indexOf(bookToBeDeleted), 1);
-    let altLib = myLibrary.map(book => book.title);
-    console.log(altLib);
+
+    let book = myLibrary.find(book => book.index == e.target.value);
+    myLibrary.splice(myLibrary.indexOf(book), 1);
+    removeBookFromStorage(book);
+}
+
+function updateTable() {
+
+    if (window.localStorage.length === 0) { return; }
+
+    Object.keys(localStorage).forEach(id => {
+        let strBook = localStorage.getItem(id);
+        let newBook = JSON.parse(strBook);
+        myLibrary.push(newBook);
+        addBookToTable(newBook);
+    })
 }
 
 function deactivateAddBtn() {
@@ -80,6 +99,15 @@ function deactivateAddBtn() {
     (title === '' || author === '' || pages === '') ? 
         btnAddBook.disabled = true : btnAddBook.disabled = false;
 };
+
+function addBookToStorage(book) {
+    let strBook = JSON.stringify(book);
+    window.localStorage.setItem(book.index, strBook);
+}
+
+function removeBookFromStorage(book) {
+    window.localStorage.removeItem(book.index);
+}
 
 let myLibrary = [];
 const container = document.querySelector('#container');
@@ -172,3 +200,4 @@ libTable.appendChild(tableBody);
 container.appendChild(libTable);
 
 deactivateAddBtn();
+updateTable();
