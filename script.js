@@ -3,31 +3,38 @@ function Book(title, author, pages, isRead) {
     this.title = title;
     this.author = author;
     this.pages = pages;
-    this.isRead = (isRead === true) ? 'Read' : 'Not read';
+    this.isRead = isRead;
 }
 
-Book.prototype.changeReadStatus = function(e) {
-    this.isRead = (this.isRead === 'Read') ? 'Not read' : 'Read';
+/**
+ * Update the isRead parameter of the given book,
+ * update the Read button accordingly, and re-evaluate (not) read stats.
+ * @param {*} e     event handler
+ * @param {*} book  book to be updated
+ */
+function changeReadStatus(e, book) {
+    book.isRead = !book.isRead;
+
+    reverseReadDetails(book);
 
     e.target.classList.toggle('active');
-    e.target.textContent = this.isRead;
+    e.target.textContent = (book.isRead) ? 'Yes' : 'No';
 }
 
 const addBookToTable = (book) => {
     let newTableRow = tableBody.insertRow();
         
         for (const [key, value] of Object.entries(book)) {
-            if (key === 'index') continue;
+            if (key === 'index') continue; // Do not shown indices
 
             let newCell = newTableRow.insertCell();
 
             if (key === 'isRead') {
                 let btnIsRead = document.createElement('button');
                 btnIsRead.classList.add('btn-is-read');
-                var self = book;
-                btnIsRead.addEventListener('click', book.changeReadStatus);
-                if (value === 'Read') { btnIsRead.classList.toggle('active'); }
-                btnIsRead.textContent = value;
+                btnIsRead.addEventListener('click', (e) => changeReadStatus(e, book));
+                if (value) { btnIsRead.classList.toggle('active'); }
+                btnIsRead.textContent = (value) ? 'Yes' : 'No';
                 newCell.appendChild(btnIsRead);
                 continue;
             }
@@ -36,6 +43,8 @@ const addBookToTable = (book) => {
             newCell.appendChild(textValue);
         }
 
+    /* Encapsulate function to scope of addBookToTable(),
+     * since it is only necessary for this function. */
     (function addDeleteButton() {
         let btnDelete = document.createElement('button');
         btnDelete.textContent = 'X';
@@ -45,7 +54,6 @@ const addBookToTable = (book) => {
         let deleteCell = newTableRow.insertCell();
         deleteCell.classList.add('delete-cell');
         deleteCell.appendChild(btnDelete);
-        
     }());
 }
 
@@ -55,12 +63,13 @@ const addBookToLibrary = () => {
     let pages = inpBookPages.value;
     let isRead = inpBookIsRead.checked;
     
-    let newBook = new Book(title, author, pages, isRead);
-    myLibrary.push(newBook);
-    newBook.index = myLibrary.indexOf(newBook);
+    let book = new Book(title, author, pages, isRead);
+    myLibrary.push(book);
+    book.index = myLibrary.indexOf(book);
 
-    addBookToStorage(newBook);
-    addBookToTable(newBook);
+    addBookToStorage(book);
+    addBookToTable(book);
+    addReadDetails(book);
 
     (function clearInputFlds() {
         inpBookTitle.value = '';
@@ -70,17 +79,12 @@ const addBookToLibrary = () => {
     }());
 };
 
-const deleteBook = (e) => {
-    let row = e.target.parentNode.parentNode;
-    row.parentNode.removeChild(row);
-
-    let book = myLibrary.find(book => book.index == e.target.value);
-    myLibrary.splice(myLibrary.indexOf(book), 1);
-    removeBookFromStorage(book);
-}
-
+/**
+ * Retrieves the user's books from localStorage
+ * and re-inserts them into the books array and table.
+ * @returns 
+ */
 function updateTable() {
-
     if (window.localStorage.length === 0) { return; }
 
     Object.keys(localStorage).forEach(id => {
@@ -91,26 +95,87 @@ function updateTable() {
     })
 }
 
+/**
+ * Forbids the user from adding a book without entering the required details.
+ */
 function deactivateAddBtn() {
     let title = inpBookTitle.value;
     let author = inpBookAuthor.value;
     let pages = inpBookPages.value;
 
-    (title === '' || author === '' || pages === '') ? 
-        btnAddBook.disabled = true : btnAddBook.disabled = false;
+    btnAddBook.disabled = (title === '' || author === '' || pages === '') ? true : false;
 };
 
-function addBookToStorage(book) {
+const deleteBook = (e) => {
+    let row = e.target.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+
+    let book = myLibrary.find(book => book.index == e.target.value);
+    myLibrary.splice(myLibrary.indexOf(book), 1);
+    removeReadDetails(book);
+    removeBookFromStorage(book);
+}
+
+const addBookToStorage = (book) => {
     let strBook = JSON.stringify(book);
     window.localStorage.setItem(book.index, strBook);
 }
 
-function removeBookFromStorage(book) {
+const removeBookFromStorage = (book) => {
     window.localStorage.removeItem(book.index);
 }
 
+const addReadDetails = (book) => {
+    if (book.isRead) {
+        read++;
+    } else {
+        notRead++;
+    }
+    readAmount.textContent = read;
+    notReadAmount.textContent = notRead;
+}
+
+const removeReadDetails = (book) => {
+    if (book.isRead) {
+        read--;
+    } else {
+        notRead--;
+    }
+    readAmount.textContent = read;
+    notReadAmount.textContent = notRead;
+}
+
+/**
+ * Updates the storage by deleting the book
+ * with the outdated isRead attribute,
+ * and re-inserts it with the updated one.
+ * @param {*} book  book to be updated
+ */
+const reverseReadDetails = (book) => {
+    if (book.isRead) {
+        read++;
+        notRead--;
+    } else {
+        read--;
+        notRead++;
+    }
+    readAmount.textContent = read;
+    notReadAmount.textContent = notRead;
+
+    removeBookFromStorage(book);
+    addBookToStorage(book);
+}
+
+/* Main */
 let myLibrary = [];
+let read = 0;
+let notRead = 0;
+
 const container = document.querySelector('#container');
+
+const title = document.createElement('h1');
+title.textContent = 'My Library';
+container.appendChild(title);
 
 /* Add Book form */
 const formContainer = document.createElement('div');
@@ -171,6 +236,31 @@ container.appendChild(formContainer);
 const fldsInput = document.querySelectorAll('.fld-input');
 fldsInput.forEach(fld => {fld.addEventListener('input', deactivateAddBtn)});
 
+/* Add reading details */
+const detailsContainer = document.createElement('div');
+detailsContainer.setAttribute('id', 'detailsContainer');
+
+const lblReadAmount = document.createElement('label');
+lblReadAmount.textContent = 'Read Books:';
+detailsContainer.appendChild(lblReadAmount);
+
+const readAmount = document.createElement('div');
+readAmount.classList.add('details');
+readAmount.textContent = read;
+detailsContainer.appendChild(readAmount);
+
+const lblNotReadAmount = document.createElement('label');
+lblNotReadAmount.setAttribute('for', 'NotReadAmount');
+lblNotReadAmount.textContent = 'To Be Read:';
+detailsContainer.appendChild(lblNotReadAmount);
+
+const notReadAmount = document.createElement('div');
+notReadAmount.classList.add('details');
+notReadAmount.textContent = notRead;
+detailsContainer.appendChild(notReadAmount);
+
+container.appendChild(detailsContainer);
+
 /* Add Library Table */
 const libTable = document.createElement('table');
 libTable.setAttribute('id', 'library');
@@ -199,5 +289,7 @@ libTable.appendChild(tableBody);
 
 container.appendChild(libTable);
 
+
 deactivateAddBtn();
 updateTable();
+myLibrary.forEach(book => addReadDetails(book));
