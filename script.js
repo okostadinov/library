@@ -1,10 +1,17 @@
-function Book(title, author, pages, isRead) {
-    this.index = 0;
-    this.title = title;
-    this.author = author;
-    this.pages = pages;
-    this.isRead = isRead;
-}
+class Book{
+    index = 0;
+
+    constructor(title, author, pages, isRead) {
+        this.title = title;
+        this.author = author;
+        this.pages = pages;
+        this.isRead = isRead;
+    }
+
+    set index(index) {
+        this.index = index;
+    }
+};
 
 /**
  * Update the isRead parameter of the given book,
@@ -103,7 +110,10 @@ function deactivateAddBtn() {
     let author = inpBookAuthor.value;
     let pages = inpBookPages.value;
 
-    btnAddBook.disabled = (title === '' || author === '' || pages === '') ? true : false;
+    btnAddBook.disabled = (title === '' 
+        || author === '' 
+        || pages === '') 
+        ? true : false;
 };
 
 const deleteBook = (e) => {
