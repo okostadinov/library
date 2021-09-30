@@ -135,14 +135,20 @@ const removeBookFromStorage = (book) => {
     window.localStorage.removeItem(book.index);
 }
 
+const refreshReadDetails = () => {
+    // readAmount.textContent = read;
+    // notReadAmount.textContent = notRead;
+    lblReadAmount.textContent = 'Read Books: ' + read;
+    lblNotReadAmount.textContent = 'To Be Read: ' + notRead;
+}
+
 const addReadDetails = (book) => {
     if (book.isRead) {
         read++;
     } else {
         notRead++;
     }
-    readAmount.textContent = read;
-    notReadAmount.textContent = notRead;
+    refreshReadDetails();
 }
 
 const removeReadDetails = (book) => {
@@ -151,8 +157,7 @@ const removeReadDetails = (book) => {
     } else {
         notRead--;
     }
-    readAmount.textContent = read;
-    notReadAmount.textContent = notRead;
+    refreshReadDetails();
 }
 
 /**
@@ -169,8 +174,7 @@ const reverseReadDetails = (book) => {
         read--;
         notRead++;
     }
-    readAmount.textContent = read;
-    notReadAmount.textContent = notRead;
+    refreshReadDetails();
 
     removeBookFromStorage(book);
     addBookToStorage(book);
@@ -247,23 +251,23 @@ const detailsContainer = document.createElement('div');
 detailsContainer.setAttribute('id', 'detailsContainer');
 
 const lblReadAmount = document.createElement('label');
-lblReadAmount.textContent = 'Read Books: ';
+lblReadAmount.textContent = 'Read Books: ' + read;
 detailsContainer.appendChild(lblReadAmount);
 
-const readAmount = document.createElement('div');
-readAmount.classList.add('details');
-readAmount.textContent = read;
-detailsContainer.appendChild(readAmount);
+// const readAmount = document.createElement('div');
+// readAmount.classList.add('details');
+// readAmount.textContent = read;
+// detailsContainer.appendChild(readAmount);
 
 const lblNotReadAmount = document.createElement('label');
 lblNotReadAmount.setAttribute('for', 'NotReadAmount');
-lblNotReadAmount.textContent = 'To Be Read: ';
+lblNotReadAmount.textContent = 'To Be Read: ' + notRead;
 detailsContainer.appendChild(lblNotReadAmount);
 
-const notReadAmount = document.createElement('div');
-notReadAmount.classList.add('details');
-notReadAmount.textContent = notRead;
-detailsContainer.appendChild(notReadAmount);
+// const notReadAmount = document.createElement('div');
+// notReadAmount.classList.add('details');
+// notReadAmount.textContent = notRead;
+// detailsContainer.appendChild(notReadAmount);
 
 container.appendChild(detailsContainer);
 
