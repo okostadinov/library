@@ -183,10 +183,6 @@ let notRead = 0;
 
 const container = document.querySelector('#container');
 
-const title = document.createElement('h1');
-title.textContent = 'My Library';
-container.appendChild(title);
-
 /* Add Book form */
 const formContainer = document.createElement('div');
 formContainer.setAttribute('id', 'formContainer');
@@ -251,7 +247,7 @@ const detailsContainer = document.createElement('div');
 detailsContainer.setAttribute('id', 'detailsContainer');
 
 const lblReadAmount = document.createElement('label');
-lblReadAmount.textContent = 'Read Books:';
+lblReadAmount.textContent = 'Read Books: ';
 detailsContainer.appendChild(lblReadAmount);
 
 const readAmount = document.createElement('div');
@@ -261,7 +257,7 @@ detailsContainer.appendChild(readAmount);
 
 const lblNotReadAmount = document.createElement('label');
 lblNotReadAmount.setAttribute('for', 'NotReadAmount');
-lblNotReadAmount.textContent = 'To Be Read:';
+lblNotReadAmount.textContent = 'To Be Read: ';
 detailsContainer.appendChild(lblNotReadAmount);
 
 const notReadAmount = document.createElement('div');
